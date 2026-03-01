@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>OutreachOps</title>
+  <link rel="icon" href="./assets/outreachops_logo.svg" type="image/svg+xml">
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img src="./assets/outreachops_logo.svg" class="logo" alt="OutreachOps logo" /><strong>OutreachOps</strong></div>
+    <div class="chips"><span class="chip">Coordinator</span><span class="chip">7d</span><span id="modeChip" class="chip">LIVE</span><button id="refreshBtn" class="chip-btn">Refresh</button></div>
+  </header>
+
+  <section id="dashboardScreen" class="screen active">
+    <div class="kpis" id="kpiStrip">
+      <article><h3>Backlog</h3><p id="kpiBacklog">0</p></article>
+      <article><h3>Avg response (min)</h3><p id="kpiResponse">0</p></article>
+    </div>
+    <div id="map"></div>
+    <button id="requestFab" class="fab left">Request</button>
+    <button id="logFab" class="fab">Log</button>
+
+    <section class="sheet">
+      <div class="tabs"><button data-tab="priority" class="active">Priority</button><button data-tab="resources">Resources</button></div>
+      <div id="tabPriority" class="tab-content active">
+        <p class="muted">NRGI (P = Demand / (Capacity + 0.1)). Demand uses weighted aggregation. APG privacy gate: W=7d, k=10 (below threshold => 데이터 부족). CWS applies source weights, time decay, and anomaly penalties.</p>
+        <ul id="priorityList"></ul>
+      </div>
+      <div id="tabResources" class="tab-content">
+        <p class="muted">Adjust capacity for selected grid to reprioritize immediately.</p>
+        <div id="resourceEditor">Select a grid cell first.</div>
+      </div>
+    </section>
+  </section>
+
+  <section id="requestScreen" class="screen">
+    <h2>Request</h2>
+    <p class="muted">Step 1: Select category</p>
+    <div id="requestCategories" class="category-grid"></div>
+    <p class="muted">Step 2: Tap a grid cell on map (from Dashboard) or use selected: <span id="selectedGridPreview">none</span></p>
+    <p class="muted">Step 3: Confirm and submit</p>
+    <label><input type="checkbox" id="requestSafetyCheck"/> Safety check: no identifying details included.</label>
+    <div class="row"><button id="cancelRequest">Cancel</button><button id="submitRequest" disabled>Submit Request</button></div>
+    <p id="requestFeedback" class="feedback"></p>
+  </section>
+
+  <section id="safetyScreen" class="screen">
+    <h2>Safety</h2>
+    <ul class="safety-list">
+      <li>No pins, precise coordinates, photos, or paths are shown publicly.</li>
+      <li>No enforcement/crackdown use. No targeting for raids.</li>
+      <li>No tips for sustaining or evading homelessness.</li>
+      <li>Data is grid_id only; no address, name, phone, or personal identifiers.</li>
+      <li>Signals retained to a 7-day analysis window.</li>
+      <li>Abuse prevention: rate limiting and spike anomaly penalties are active.</li>
+    </ul>
+  </section>
+
+  <dialog id="logDialog">
+    <form method="dialog" id="logForm">
+      <h3>Outreach Log</h3>
+      <p>Grid: <span id="logGridPreview">none</span></p>
+      <label>Action
+        <select id="logAction"><option>contact_attempt</option><option>supply_delivery</option><option>welfare_check</option></select>
+      </label>
+      <label>Outcome
+        <select id="logOutcome"><option>completed</option><option>pending_followup</option><option>unresolved</option></select>
+      </label>
+      <label><input type="checkbox" id="logSafetyCheck"/> Safety check: no identifying text logged.</label>
+      <div class="row"><button value="cancel">Cancel</button><button id="saveLog" value="default" disabled>Save Log</button></div>
+    </form>
+  </dialog>
+
+  <nav class="bottom-nav">
+    <button data-screen="dashboardScreen" class="active">Dashboard</button>
+    <button data-screen="requestScreen">Request</button>
+    <button data-screen="safetyScreen">Safety</button>
+  </nav>
+
+  <div id="toast"></div>
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
