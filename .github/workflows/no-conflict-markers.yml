@@ -1,0 +1,17 @@
+name: No conflict markers
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fail on merge conflict markers
+        run: |
+          if rg -n "^<<<<<<<|^=======|^>>>>>>>" .; then
+            echo "Conflict markers found"
+            exit 1
+          fi
