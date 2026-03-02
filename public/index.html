@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>OutreachOps</title>
+  <link rel="icon" href="./assets/outreachops_logo.svg" type="image/svg+xml" />
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-wrap">
+      <img src="./assets/outreachops_logo.svg" class="logo" alt="OutreachOps logo" />
+      <div>
+        <strong>OutreachOps</strong>
+        <div class="chip-row">
+          <span id="modeChip" class="chip">LIVE</span>
+          <span class="chip">7d</span>
+        </div>
+      </div>
+    </div>
+    <div class="actions-row">
+      <button id="selectedChip" class="chip-btn">Selected: none</button>
+      <button id="seedDemoBtn" class="chip-btn" type="button">Demo seed</button><button id="infoBtn" class="chip-btn" aria-label="Info">i</button>
+    </div>
+  </header>
+
+  <div id="offlineBanner" class="banner hidden">Firestore unavailable, using demo data</div>
+
+  <section id="dashboardScreen" class="screen active">
+    <section id="kpiStrip" class="kpis">
+      <article><h3>Backlog</h3><p id="kpiBacklog">0</p></article>
+      <article><h3>Avg response (min)</h3><p id="kpiResponse">0.0</p></article>
+    </section>
+
+    <section class="map-wrap dashboard-map-wrap">
+      <div id="mapDashboard"></div>
+      <div class="legend">Legend: <span>높음</span> <span>중간</span> <span>낮음</span> <span>데이터 부족</span></div>
+    </section>
+
+    <button id="requestFab" class="fab fab-left">Request</button>
+    <button id="logFab" class="fab">Log</button>
+
+    <section class="sheet" id="bottomSheet">
+      <button id="sheetToggle" class="sheet-toggle">Details ▾</button>
+      <div class="tabs"><button data-tab="priority" class="active">Priority</button><button data-tab="resources">Resources</button></div>
+      <div id="tabPriority" class="tab-content active">
+        <ul id="priorityList"></ul>
+      </div>
+      <div id="tabResources" class="tab-content">
+        <div id="resourceEditor"></div>
+      </div>
+    </section>
+  </section>
+
+  <section id="requestScreen" class="screen">
+    <div class="request-header">
+      <h2>Request</h2>
+      <span id="requestSelectedChip" class="chip">Selected: none</span>
+    </div>
+
+    <div class="steps">
+      <div class="step-card">
+        <h3>1) Category</h3>
+        <div id="requestCategories" class="category-grid"></div>
+      </div>
+
+      <div class="step-card">
+        <h3>2) Pick grid</h3>
+        <div id="mapRequest"></div>
+        <p class="muted">Tap a cell to select. Grid overlay always reflects zoom level (z6/z9/z12).</p>
+      </div>
+
+      <div class="step-card">
+        <h3>3) Confirm</h3>
+        <label><input type="checkbox" id="requestSafetyCheck" /> Safety mini-check: no identifying details included.</label>
+        <div class="row">
+          <button id="cancelRequest" type="button">Cancel</button>
+          <button id="submitRequest" type="button" disabled>Submit</button>
+        </div>
+      </div>
+    </div>
+    <p id="requestFeedback" class="feedback"></p>
+  </section>
+
+  <section id="safetyScreen" class="screen">
+    <h2>Safety Checklist</h2>
+    <ul class="safety-list">
+      <li>No pins, precise coordinates, photos, or paths are shown publicly.</li>
+      <li>No enforcement/crackdown usage and no raid-targeting workflow.</li>
+      <li>No tips for sustaining or evading homelessness.</li>
+      <li>Only grid_id-centric data is stored (no names/phones/addresses/PII).</li>
+      <li>APG privacy gate: 7-day window, k=10. Below threshold shows 데이터 부족 only.</li>
+      <li>Abuse prevention: repeat-rate limiting and spike anomaly penalty are active.</li>
+    </ul>
+  </section>
+
+  <dialog id="logDialog">
+    <form method="dialog" id="logForm">
+      <h3>Outreach Log</h3>
+      <p id="logGridLabel">Select a grid cell first.</p>
+      <label>Action
+        <select id="logAction">
+          <option value="contact_attempt">contact_attempt</option>
+          <option value="supply_delivery">supply_delivery</option>
+          <option value="welfare_check">welfare_check</option>
+        </select>
+      </label>
+      <label>Outcome
+        <select id="logOutcome">
+          <option value="completed">completed</option>
+          <option value="pending_followup">pending_followup</option>
+          <option value="unresolved">unresolved</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="logSafetyCheck" /> Safety mini-check: no identifying text logged.</label>
+      <div class="row">
+        <button value="cancel">Cancel</button>
+        <button id="saveLog" value="default" disabled>Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="infoDialog">
+    <article class="info-card">
+      <h3>How ranking works</h3>
+      <p>Demand is weighted aggregation (CWS): source weight × time decay × anomaly penalty.</p>
+      <p>Priority is NRGI: P = Demand / (Capacity + 0.1).</p>
+      <p>APG privacy gate: window=7 days, k=10; below threshold only shows “데이터 부족”.</p>
+      <form method="dialog"><button>Close</button></form>
+    </article>
+  </dialog>
+
+  <nav class="bottom-nav">
+    <button data-screen="dashboardScreen" class="active">Dashboard</button>
+    <button data-screen="requestScreen">Request</button>
+    <button data-screen="safetyScreen">Safety</button>
+  </nav>
+
+  <div id="toast"></div>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
