@@ -28,6 +28,9 @@ The prior build rendered map tiles but grid interaction was unreliable because s
 - **F1** Submit Request (category + grid + safety check) → immediate demand/classification/priority update.
 - **F2** Save capacity in Resources tab → immediate visible priority reorder.
 - **F3** Save Outreach Log → immediate KPI update with visual highlight.
+- First-run helper: **Demo seed** chip loads 3 publishable cells (demo-only label) so APG-gated maps remain demonstrable without manual backend setup.
+
+## Dev run
 
 ## Dev run
 Mobile-first outreach triage dashboard with strict privacy controls.
